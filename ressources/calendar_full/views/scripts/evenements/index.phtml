@@ -1,0 +1,101 @@
+<div id="gen_new_content" title="Nouvel événement">
+    <form action="">
+        <label class="label_evenement" for="new_event_title">Objet : </label><input type="text" class="lab_form" name="new_event_title" id="new_event_title" /><br />
+        <label class="label_evenement" for="new_event_lieu">Lieu : </label><input type="text" class="lab_form" name="new_event_lieu" id="new_event_lieu" />
+    </form>
+</div>
+<div id="create_event"></div>
+<div id="ajax_load"></div>
+<div id="dialog" title="Suppression">Veuillez confirmer la suppression</div>
+<div id="switcher_agenda_options">
+    <div id="choix_plage_horaire">
+        <?php
+        $next_week_start=$this->next_week;
+        $bef_week_start=$this->bef_week;
+
+        $day_next=date('d',$next_week_start);
+        $month_next=date('m',$next_week_start);
+        $year_next=date('Y',$next_week_start);
+
+        $day_bef=date('d',$bef_week_start);
+        $month_bef=date('m',$bef_week_start);
+        $year_bef=date('Y',$bef_week_start);
+        ?>
+        <a class="info" href="<?php echo $this->url(array("module"=>"admin","controller"=>"evenements","d"=>"$day_bef","m"=>"$month_bef","y"=>"$year_bef"),'default','true'); ?>"><img src="<?php echo $this->baseUrl()."/public/themes/admin/img/icons/bef_week.png";?>" alt="before" /><span><?php echo $this->bef_week_start." au ".$this->bef_week_end; ?></span></a>
+        <a class="info" href="<?php echo $this->url(array("module"=>"admin","controller"=>"evenements","d"=>"$day_next","m"=>"$month_next","y"=>"$year_next"),'default','true'); ?>"><img src="<?php echo $this->baseUrl()."/public/themes/admin/img/icons/next_week.png";?>" alt="next" /><span><?php echo $this->next_week_start." au ".$this->next_week_end; ?></span></a>
+        <span class="semaine_en_cours">Semaine du <?php echo date('d/m/Y',$this->semaine_debut)." au ".date('d/m/Y',$this->semaine_fin);?></span>
+
+    </div>
+    <div id="switcher_agenda">
+        <span class="switcher_agenda_inside selected_switch_agenda"><a href="<?php echo $this->url(array("module"=>"admin","controller"=>"evenements","action"=>"index"),'default','true'); ?>">Semaine</a></span>
+        <span class="switcher_agenda_inside"><a href="<?php echo $this->url(array("module"=>"admin","controller"=>"evenements","action"=>"journee"),'default','true'); ?>">Journée</a></span>
+        <span class="switcher_agenda_inside"><a href="<?php echo $this->url(array("module"=>"admin","controller"=>"evenements","action"=>"planning"),'default','true'); ?>">Planning</a></span>
+    </div>
+</div>
+<div id="calendrier">
+    <table id="calendar_table">
+        <thead>
+            <tr>
+                <th></th>
+                <?php foreach($this->thead as $thead):
+                    $day_link=date('d',$thead[2]);
+                    $month_link=date('m',$thead[2]);
+                    $year_link=date('Y',$thead[2]);
+
+                    $class_th="";
+
+                    if(mktime(0,0,0,$month_link,$day_link,$year_link) == mktime(0,0,0,date('m',time()),date('d',time()),date('Y',time())))
+                        $class_th=" style='color: #D96666;font-weight:bolder;' ";
+                    ?>
+                <th><a <?php echo $class_th;?> href="<?php echo $this->url(array("module"=>"admin","controller"=>"evenements","action"=>"journee","d"=>"$day_link","m"=>"$month_link","y"=>"$year_link"),'default','true'); ?>"><?php echo $thead[1];?></a></th>
+                <?php endforeach; ?>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td class="info_horaires">
+                    <?php foreach($this->horaires as $horaire):?>
+
+                        <?php echo "<div class='info_horaires_content'>".$horaire."</div>"; ?>
+                    <?php endforeach; ?>
+                </td>
+                <?php foreach($this->table_content as $content):?>
+                <td valign="top" class="<?php echo $content['class']; ?> calendar_td" id="<?php echo $content['day_start'];?>">
+                        <?php
+                        for($i=0;$i<$content['nb'];$i++) {
+                            $content_current_debut=$content['events'][$i]['debut'];
+                            $content_current_fin=$content['events'][$i]['fin'];
+                            $content_current_size=$content['events'][$i]['size'];
+                            $content_current_id=$content['events'][$i]['id'];
+                            $padding_top=$content['events'][$i]['qhstart']*10;
+
+
+                            echo'
+<div class="calendar_event" id="'.$content_current_id.'" style="height:'.$content_current_size.'px; margin-top:'.$padding_top.'px;">
+<div class="calendar_event_date" id="'.$content_current_id.'_date" >
+<span id="'.$content_current_id.'_date_debut_heure">'.date('H',$content_current_debut).'</span>:
+<span id="'.$content_current_id.'_date_debut_minute">'.date('i',$content_current_debut).'</span> -
+<span id="'.$content_current_id.'_date_fin_heure">'.date('H',$content_current_fin).'</span>:
+<span id="'.$content_current_id.'_date_fin_minute">'.date('i',$content_current_fin).'</span>
+</div>
+<div class="calendar_event_title" id="'.$content_current_id.'_title">'.$content['events'][$i]['titre'].'</div>
+<div class="calendar_event_lieu" id="'.$content_current_id.'_lieu" style="display:none;">'.$content['events'][$i]['lieu'].'</div>
+</div>';
+                        //$qh=intval( $content['events'][$i]['qhstart'] + $content['events'][$i]['qhoccured'] -1);
+                        } ?>
+                </td>
+                <?php endforeach; ?>
+
+
+
+
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
